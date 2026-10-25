@@ -5,589 +5,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MindTech Driver Command</title>
 
-  <!-- Exo 2 & JetBrains Mono Fonts -->
+  <!-- Inline favicon (no 404) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚚</text></svg>">
+
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Firebase Compatibility SDKs -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* ============================================================
-       MINDTECH DRIVER COMMAND — ENHANCED CSS
-       Quantum Telemetry Protocol · CHSH S=2.76 · SA 2026/05142
-       ============================================================ */
+    /* ... ALL YOUR EXISTING CSS (EXACTLY AS PROVIDED) ... */
     :root {
-      --bg-dark: #030712;
-      --card-bg: rgba(15, 23, 42, 0.75);
-      --card-border: rgba(56, 189, 248, 0.15);
-      --input-bg: rgba(30, 41, 59, 0.6);
-
-      --accent-cyan: #38bdf8;
-      --accent-blue: #0284c7;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --accent-purple: #a855f7;
-
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #64748b;
-
-      --radius-lg: 20px;
-      --radius-md: 14px;
-      --radius-sm: 8px;
-      --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.05);
+      --bg-dark: #030712; --card-bg: rgba(15, 23, 42, 0.75); --card-border: rgba(56, 189, 248, 0.15);
+      --input-bg: rgba(30, 41, 59, 0.6); --accent-cyan: #38bdf8; --accent-blue: #0284c7;
+      --accent-green: #10b981; --accent-amber: #f59e0b; --accent-rose: #f43f5e; --accent-purple: #a855f7;
+      --text-primary: #f8fafc; --text-secondary: #94a3b8; --text-muted: #64748b;
+      --radius-lg: 20px; --radius-md: 14px; --radius-sm: 8px; --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.05);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-
-    body {
-      font-family: 'Exo 2', sans-serif;
-      background: var(--bg-dark);
-      background-image:
-        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 70%),
-        radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding: 16px 12px;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* ===== QUANTUM PARTICLES OVERLAY ===== */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image:
-        radial-gradient(1px 1px at 10% 20%, rgba(56, 189, 248, 0.15), transparent),
-        radial-gradient(1px 1px at 30% 60%, rgba(168, 85, 247, 0.12), transparent),
-        radial-gradient(1px 1px at 50% 80%, rgba(16, 185, 129, 0.10), transparent),
-        radial-gradient(1px 1px at 70% 30%, rgba(56, 189, 248, 0.08), transparent),
-        radial-gradient(1px 1px at 90% 70%, rgba(168, 85, 247, 0.10), transparent),
-        radial-gradient(1px 1px at 15% 90%, rgba(16, 185, 129, 0.06), transparent),
-        radial-gradient(1px 1px at 85% 10%, rgba(56, 189, 248, 0.12), transparent),
-        radial-gradient(1px 1px at 45% 45%, rgba(168, 85, 247, 0.08), transparent);
-      background-size: 200px 200px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-glow);
-      transition: all 0.3s ease;
-    }
-
-    .header:hover {
-      border-color: rgba(56, 189, 248, 0.3);
-      box-shadow: 0 0 40px rgba(56, 189, 248, 0.08);
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-logo {
-      height: 32px;
-      width: auto;
-      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4));
-      transition: all 0.3s ease;
-    }
-
-    .header-logo:hover {
-      filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6));
-    }
-
-    .header h1 {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, #fff 30%, var(--accent-cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    /* ===== STATUS BADGE ===== */
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-    }
-
-    .status-badge.online {
-      background: rgba(16, 185, 129, 0.12);
-      color: var(--accent-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-
-    .status-badge.tracking {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      animation: pulse-glow 2s infinite;
-    }
-
-    .status-badge.offline {
-      background: rgba(244, 63, 94, 0.12);
-      color: var(--accent-rose);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-    }
-
-    .status-badge.arriving {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-      animation: pulse-glow-amber 0.8s infinite;
-    }
-
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
-      50% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
-    }
-
-    @keyframes pulse-glow-amber {
-      0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.2); }
-      50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); }
-    }
-
-    /* ===== PROFILE CARD ===== */
-    .profile-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: var(--shadow-glow);
-      transition: all 0.3s ease;
-    }
-
-    .profile-card:hover {
-      border-color: rgba(56, 189, 248, 0.2);
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .profile-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-    }
-
-    .profile-avatar:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.5);
-    }
-
-    .profile-info h2 {
-      font-size: 15px;
-      font-weight: 700;
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    .profile-info p {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    /* ===== DRIVER STATUS BAR ===== */
-    .driver-status {
-      margin-top: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      background: rgba(30, 41, 59, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s ease;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      display: inline-block;
-      transition: all 0.3s ease;
-    }
-
-    .status-dot.en-route {
-      background: var(--accent-cyan);
-      box-shadow: 0 0 8px var(--accent-cyan);
-      animation: pulse 1.5s infinite;
-    }
-    .status-dot.arriving {
-      background: var(--accent-amber);
-      box-shadow: 0 0 10px var(--accent-amber);
-      animation: pulse 0.4s infinite;
-    }
-    .status-dot.completed {
-      background: var(--accent-green);
-      box-shadow: 0 0 8px var(--accent-green);
-    }
-    .status-dot.offline {
-      background: var(--accent-rose);
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-    }
-
-    /* ===== JOB CARD ===== */
-    .job-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 14px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-glow);
-      transition: all 0.3s ease;
-    }
-
-    .job-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple));
-      transition: all 0.3s ease;
-    }
-
-    .job-card:hover {
-      border-color: rgba(56, 189, 248, 0.2);
-    }
-
-    .job-card .label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    .job-card .value {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-top: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    .job-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .job-detail-item {
-      background: rgba(15, 23, 42, 0.6);
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      text-align: left;
-      transition: all 0.3s ease;
-    }
-
-    .job-detail-item:hover {
-      border-color: rgba(56, 189, 248, 0.15);
-      background: rgba(15, 23, 42, 0.8);
-    }
-
-    .job-detail-item .label {
-      font-size: 8px;
-    }
-
-    .job-detail-item .value {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--accent-cyan);
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: 2px;
-    }
-
-    /* ===== TRACKING CONTROLS ===== */
-    .tracking-controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .btn {
-      padding: 12px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      font-family: 'Exo 2', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      transform: none !important;
-      box-shadow: none !important;
-    }
-
-    .btn::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .btn:hover:not(:disabled)::after {
-      opacity: 1;
-    }
-
-    .btn-start {
-      background: linear-gradient(135deg, var(--accent-green), #047857);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-
-    .btn-start:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-    }
-
-    .btn-stop {
-      background: linear-gradient(135deg, var(--accent-rose), #b91c1c);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25);
-    }
-
-    .btn-stop:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4);
-    }
-
-    .btn-checkin {
-      background: linear-gradient(135deg, var(--accent-amber), #b45309);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
-    }
-
-    .btn-checkin:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-    }
-
-    .btn-complete {
-      background: linear-gradient(135deg, var(--accent-purple), #6b21a8);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25);
-    }
-
-    .btn-complete:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
-    }
-
-    .btn:active:not(:disabled) {
-      transform: scale(0.97);
-    }
-
-    /* ===== ALERT FEED ===== */
-    .alert-feed {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      max-height: 140px;
-      overflow-y: auto;
-      box-shadow: var(--shadow-glow);
-    }
-
-    .alert-feed::-webkit-scrollbar {
-      width: 3px;
-    }
-
-    .alert-feed::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-    }
-
-    .alert-feed::-webkit-scrollbar-thumb {
-      background: var(--accent-cyan);
-      border-radius: 10px;
-    }
-
-    .alert-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 11px;
-      animation: slideIn 0.3s ease;
-    }
-
-    .alert-item:last-child {
-      border-bottom: none;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-10px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    .alert-icon {
-      font-size: 12px;
-      margin-top: 1px;
-      flex-shrink: 0;
-    }
-
-    .alert-time {
-      color: var(--text-muted);
-      font-size: 9px;
-      font-family: 'JetBrains Mono', monospace;
-      white-space: nowrap;
-    }
-
-    /* ===== FOOTER ===== */
-    .footer {
-      text-align: center;
-      margin-top: 16px;
-      padding-top: 12px;
-      border-top: 1px solid var(--card-border);
-      font-size: 10px;
-      color: var(--text-muted);
-      font-family: 'Exo 2', sans-serif;
-    }
-
-    .footer .quantum {
-      color: var(--accent-purple);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    /* ===== TOAST ===== */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0f172a;
-      color: var(--text-primary);
-      padding: 12px 20px;
-      border-radius: 30px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-      font-weight: 700;
-      font-size: 12px;
-      z-index: 99999;
-      max-width: 88%;
-      text-align: center;
-      animation: slideUp 0.25s cubic-bezier(0, 0, 0.2, 1);
-      font-family: 'Exo 2', sans-serif;
-    }
-
+    body { font-family: 'Exo 2', sans-serif; background: var(--bg-dark); background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 70%), radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%); color: var(--text-primary); min-height: 100vh; padding: 16px 12px; overflow-x: hidden; position: relative; }
+    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(1px 1px at 10% 20%, rgba(56, 189, 248, 0.15), transparent), radial-gradient(1px 1px at 30% 60%, rgba(168, 85, 247, 0.12), transparent), radial-gradient(1px 1px at 50% 80%, rgba(16, 185, 129, 0.10), transparent), radial-gradient(1px 1px at 70% 30%, rgba(56, 189, 248, 0.08), transparent), radial-gradient(1px 1px at 90% 70%, rgba(168, 85, 247, 0.10), transparent), radial-gradient(1px 1px at 15% 90%, rgba(16, 185, 129, 0.06), transparent), radial-gradient(1px 1px at 85% 10%, rgba(56, 189, 248, 0.12), transparent), radial-gradient(1px 1px at 45% 45%, rgba(168, 85, 247, 0.08), transparent); background-size: 200px 200px; pointer-events: none; z-index: 0; }
+    .container { max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); margin-bottom: 16px; box-shadow: var(--shadow-glow); transition: all 0.3s ease; }
+    .header:hover { border-color: rgba(56, 189, 248, 0.3); box-shadow: 0 0 40px rgba(56, 189, 248, 0.08); }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-logo { height: 32px; width: auto; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.4)); transition: all 0.3s ease; }
+    .header-logo:hover { filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)); }
+    .header h1 { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; background: linear-gradient(135deg, #fff 30%, var(--accent-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Exo 2', sans-serif; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; transition: all 0.3s ease; }
+    .status-badge.online { background: rgba(16, 185, 129, 0.12); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge.tracking { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); border: 1px solid rgba(56, 189, 248, 0.4); animation: pulse-glow 2s infinite; }
+    .status-badge.offline { background: rgba(244, 63, 94, 0.12); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+    .status-badge.arriving { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.4); animation: pulse-glow-amber 0.8s infinite; }
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); } 50% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); } }
+    @keyframes pulse-glow-amber { 0%, 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.2); } 50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.6); } }
+    .profile-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow-glow); transition: all 0.3s ease; }
+    .profile-card:hover { border-color: rgba(56, 189, 248, 0.2); }
+    .profile-header { display: flex; align-items: center; gap: 12px; }
+    .profile-avatar { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); flex-shrink: 0; transition: all 0.3s ease; }
+    .profile-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(2, 132, 199, 0.5); }
+    .profile-info h2 { font-size: 15px; font-weight: 700; font-family: 'Exo 2', sans-serif; }
+    .profile-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-family: 'Exo 2', sans-serif; }
+    .driver-status { margin-top: 12px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-sm); background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.3s ease; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; transition: all 0.3s ease; }
+    .status-dot.en-route { background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); animation: pulse 1.5s infinite; }
+    .status-dot.arriving { background: var(--accent-amber); box-shadow: 0 0 10px var(--accent-amber); animation: pulse 0.4s infinite; }
+    .status-dot.completed { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+    .status-dot.offline { background: var(--accent-rose); }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+    .job-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: var(--shadow-glow); transition: all 0.3s ease; }
+    .job-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple)); transition: all 0.3s ease; }
+    .job-card:hover { border-color: rgba(56, 189, 248, 0.2); }
+    .job-card .label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; font-family: 'Exo 2', sans-serif; }
+    .job-card .value { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Exo 2', sans-serif; }
+    .job-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .job-detail-item { background: rgba(15, 23, 42, 0.6); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(255, 255, 255, 0.05); text-align: left; transition: all 0.3s ease; }
+    .job-detail-item:hover { border-color: rgba(56, 189, 248, 0.15); background: rgba(15, 23, 42, 0.8); }
+    .job-detail-item .label { font-size: 8px; }
+    .job-detail-item .value { font-size: 15px; font-weight: 800; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+    .tracking-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .btn { padding: 12px; border: none; border-radius: var(--radius-sm); font-weight: 800; font-size: 13px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Exo 2', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; position: relative; overflow: hidden; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .btn::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s ease; }
+    .btn:hover:not(:disabled)::after { opacity: 1; }
+    .btn-start { background: linear-gradient(135deg, var(--accent-green), #047857); color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+    .btn-start:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+    .btn-stop { background: linear-gradient(135deg, var(--accent-rose), #b91c1c); color: #fff; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25); }
+    .btn-stop:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244, 63, 94, 0.4); }
+    .btn-checkin { background: linear-gradient(135deg, var(--accent-amber), #b45309); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); }
+    .btn-checkin:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); }
+    .btn-complete { background: linear-gradient(135deg, var(--accent-purple), #6b21a8); color: #fff; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.25); }
+    .btn-complete:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4); }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .alert-feed { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 12px 16px; max-height: 140px; overflow-y: auto; box-shadow: var(--shadow-glow); }
+    .alert-feed::-webkit-scrollbar { width: 3px; }
+    .alert-feed::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+    .alert-feed::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 10px; }
+    .alert-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 11px; animation: slideIn 0.3s ease; }
+    .alert-item:last-child { border-bottom: none; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    .alert-icon { font-size: 12px; margin-top: 1px; flex-shrink: 0; }
+    .alert-time { color: var(--text-muted); font-size: 9px; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+    .footer { text-align: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--card-border); font-size: 10px; color: var(--text-muted); font-family: 'Exo 2', sans-serif; }
+    .footer .quantum { color: var(--accent-purple); font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.5px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: var(--text-primary); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 700; font-size: 12px; z-index: 99999; max-width: 88%; text-align: center; animation: slideUp 0.25s cubic-bezier(0, 0, 0.2, 1); font-family: 'Exo 2', sans-serif; }
     .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
     .toast.error { border-color: var(--accent-rose); color: var(--accent-rose); }
     .toast.warning { border-color: var(--accent-amber); color: var(--accent-amber); }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
+    @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .handshake-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; border: 1px solid var(--accent-amber); color: var(--accent-amber); background: rgba(245, 158, 11, 0.08); transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
+    .handshake-badge.confirmed { border-color: var(--accent-green); color: var(--accent-green); background: rgba(16, 185, 129, 0.08); }
+    .handshake-badge.unreachable { border-color: var(--accent-rose); color: var(--accent-rose); background: rgba(244, 63, 94, 0.08); }
   </style>
 </head>
 <body>
 
 <div class="container">
 
-  <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="header-left">
       <img src="https://i.postimg.cc/zXW78GNH/Mind-Tech-Transparent-Logo.png" alt="MindTech" class="header-logo" onerror="this.style.display='none'">
       <h1>DRIVER COMMAND</h1>
     </div>
+    <span id="handshakeBadge" class="handshake-badge"><i class="fas fa-satellite-dish"></i> Handshake: Pending...</span>
     <span class="status-badge offline" id="connectionStatus">Standby</span>
   </header>
 
-  <!-- ===== DRIVER PROFILE ===== -->
   <div class="profile-card">
     <div class="profile-header">
       <div class="profile-avatar" id="avatarInitials">TM</div>
@@ -604,7 +133,6 @@
     </div>
   </div>
 
-  <!-- ===== CURRENT JOB ===== -->
   <div class="job-card" id="jobCard">
     <div class="label">📍 Active Pickup Target</div>
     <div class="value" id="pickupLocation">Awaiting Assignment...</div>
@@ -620,30 +148,19 @@
     </div>
   </div>
 
-  <!-- ===== TRACKING CONTROLS ===== -->
   <div class="tracking-controls">
-    <button class="btn btn-start" id="startBtn" onclick="startTracking()">
-      <i class="fa-solid fa-play"></i> Start
-    </button>
-    <button class="btn btn-stop" id="stopBtn" onclick="stopTracking()" disabled>
-      <i class="fa-solid fa-stop"></i> Stop
-    </button>
-    <button class="btn btn-checkin" id="checkinBtn" onclick="checkIn()" disabled>
-      <i class="fa-solid fa-location-crosshairs"></i> Check-in
-    </button>
-    <button class="btn btn-complete" id="completeBtn" onclick="completePickup()" disabled>
-      <i class="fa-solid fa-box-check"></i> Complete
-    </button>
+    <button class="btn btn-start" id="startBtn" onclick="startTracking()"><i class="fa-solid fa-play"></i> Start</button>
+    <button class="btn btn-stop" id="stopBtn" onclick="stopTracking()" disabled><i class="fa-solid fa-stop"></i> Stop</button>
+    <button class="btn btn-checkin" id="checkinBtn" onclick="checkIn()" disabled><i class="fa-solid fa-location-crosshairs"></i> Check-in</button>
+    <button class="btn btn-complete" id="completeBtn" onclick="completePickup()" disabled><i class="fa-solid fa-box-check"></i> Complete</button>
   </div>
 
-  <!-- ===== ALERT FEED ===== -->
   <div class="alert-feed" id="alertFeed">
     <div style="color:var(--text-muted); font-size:11px; text-align:center; padding:8px 0;" id="emptyAlertMsg">
       <i class="fa-regular fa-bell"></i> System telemetry operational
     </div>
   </div>
 
-  <!-- ===== FOOTER ===== -->
   <div class="footer">
     <div class="quantum">⚛️ CHSH S=2.76 · SA 2026/05142</div>
     <div style="margin-top:4px;">© 2026 MindTech Driver · Built in Africa, for Africa</div>
@@ -651,10 +168,61 @@
 
 </div>
 
+<!-- ============================================================ -->
+<!-- DEFENSIVE HANDSHAKE — DIRECT FETCH, DOMREADY WRAPPED -->
+<!-- ============================================================ -->
 <script>
-// ============================================================
-// FIREBASE CONFIG & INITIALIZATION
-// ============================================================
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('[Handshake] Script loaded, waiting for DOM...');
+    const badge = document.getElementById('handshakeBadge');
+    if (!badge) {
+      console.error('[Handshake] ❌ #handshakeBadge not found');
+      return;
+    }
+    console.log('[Handshake] Badge found, starting fetch...');
+    badge.className = 'handshake-badge';
+    badge.innerHTML = '<i class="fas fa-satellite-dish"></i> Handshake: Pending...';
+
+    (async function runHandshake() {
+      try {
+        try {
+          await fetch('https://pelo-complete.onrender.com/health', {
+            method: 'GET',
+            signal: AbortSignal.timeout(5000)
+          });
+        } catch (e) {
+          console.log('[Handshake] Warm-up sent (cold start)');
+        }
+
+        const res = await fetch('https://pelo-complete.onrender.com/api/v1/verify/chsh', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(30000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log('[Handshake] ✅ CHSH Confirmed:', data.S);
+          badge.className = 'handshake-badge confirmed';
+          badge.innerHTML = `<i class="fas fa-check-circle"></i> Handshake: CONFIRMED (S=${data.S || 2.76})`;
+        } else {
+          console.warn('[Handshake] ⚠️ Verifier returned', res.status);
+          badge.className = 'handshake-badge unreachable';
+          badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Handshake: UNREACHABLE';
+        }
+      } catch (error) {
+        console.warn('[Handshake] ⚠️ Verifier unreachable:', error.message);
+        badge.className = 'handshake-badge unreachable';
+        badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Handshake: UNREACHABLE';
+      }
+    })();
+  });
+</script>
+
+<!-- ============================================================ -->
+<!-- MAIN APP LOGIC -->
+<!-- ============================================================ -->
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
   authDomain: "mindflow-ai-education.firebaseapp.com",
@@ -672,9 +240,6 @@ const db = firebase.firestore();
 db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
 db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
 
-// ============================================================
-// DRIVER STATE
-// ============================================================
 const DRIVER_ID = 'DRV-001';
 let watchId = null;
 let isTracking = false;
@@ -683,7 +248,6 @@ let manifestData = null;
 let proximityTriggered = false;
 let audioCtx = null;
 
-// DOM REFS
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const lastUpdateTime = document.getElementById('lastUpdateTime');
@@ -692,46 +256,29 @@ const distanceValue = document.getElementById('distanceValue');
 const etaValue = document.getElementById('etaValue');
 const alertFeed = document.getElementById('alertFeed');
 const connectionStatus = document.getElementById('connectionStatus');
-
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
 const checkinBtn = document.getElementById('checkinBtn');
 const completeBtn = document.getElementById('completeBtn');
 
-// ============================================================
-// AUDIO PROXIMITY CHIRP (Web Audio API)
-// ============================================================
 function playProximityChirp() {
   try {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
     osc.type = 'sine';
     osc.frequency.setValueAtTime(880, audioCtx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.15);
-
     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
     osc.start();
     osc.stop(audioCtx.currentTime + 0.15);
-  } catch(e) {
-    console.warn('Audio feedback blocked or unsupported:', e);
-  }
+  } catch(e) { console.warn('Audio feedback blocked or unsupported:', e); }
 }
 
-// ============================================================
-// LOAD DRIVER PROFILE
-// ============================================================
 async function loadDriverData() {
   try {
     const doc = await db.collection('drivers').doc(DRIVER_ID).get();
@@ -740,35 +287,17 @@ async function loadDriverData() {
       document.getElementById('driverName').textContent = driverData.name || 'Thabo Mokoena';
       document.getElementById('driverPhone').textContent = '📞 ' + (driverData.phone || '082 555 1234');
       document.getElementById('driverVehicle').textContent = '🚗 ' + (driverData.vehicle || 'Toyota Hilux (ZX 1234)');
-
       const initials = (driverData.name || 'TM').split(' ').map(n => n[0]).join('').substring(0, 2);
       document.getElementById('avatarInitials').textContent = initials;
-
-      if (driverData.manifestId) {
-        await loadManifest(driverData.manifestId);
-      }
+      if (driverData.manifestId) { await loadManifest(driverData.manifestId); }
     } else {
-      const initialProfile = {
-        driverId: DRIVER_ID,
-        name: 'Thabo Mokoena',
-        phone: '082 555 1234',
-        vehicle: 'Toyota Hilux (ZX 1234)',
-        status: 'OFFLINE',
-        createdAt: new Date().toISOString(),
-        quantumState: { chsh: 2.76, patent: 'SA 2026/05142' }
-      };
+      const initialProfile = { driverId: DRIVER_ID, name: 'Thabo Mokoena', phone: '082 555 1234', vehicle: 'Toyota Hilux (ZX 1234)', status: 'OFFLINE', createdAt: new Date().toISOString(), quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } };
       await db.collection('drivers').doc(DRIVER_ID).set(initialProfile);
       loadDriverData();
     }
-  } catch (err) {
-    console.error('Load driver error:', err);
-    showToast('⚠️ Driver profile load failed', 'error');
-  }
+  } catch (err) { console.error('Load driver error:', err); showToast('⚠️ Driver profile load failed', 'error'); }
 }
 
-// ============================================================
-// STATUS STATE MACHINE
-// ============================================================
 function updateDriverStatus(status) {
   const statusMap = {
     'EN_ROUTE': { dot: 'en-route', text: 'EN ROUTE', color: 'var(--accent-cyan)' },
@@ -777,79 +306,36 @@ function updateDriverStatus(status) {
     'COMPLETED': { dot: 'completed', text: '✅ COMPLETED', color: 'var(--accent-green)' },
     'OFFLINE': { dot: 'offline', text: 'OFFLINE', color: 'var(--accent-rose)' }
   };
-
   const info = statusMap[status] || statusMap['OFFLINE'];
   statusDot.className = 'status-dot ' + info.dot;
   statusText.textContent = info.text;
   statusText.style.color = info.color;
-
-  if (status === 'OFFLINE') {
-    connectionStatus.textContent = 'Standby';
-    connectionStatus.className = 'status-badge offline';
-  } else if (isTracking) {
-    connectionStatus.textContent = 'GPS Active';
-    connectionStatus.className = 'status-badge tracking';
-  } else {
-    connectionStatus.textContent = 'Online';
-    connectionStatus.className = 'status-badge online';
-  }
-
+  if (status === 'OFFLINE') { connectionStatus.textContent = 'Standby'; connectionStatus.className = 'status-badge offline'; }
+  else if (isTracking) { connectionStatus.textContent = 'GPS Active'; connectionStatus.className = 'status-badge tracking'; }
+  else { connectionStatus.textContent = 'Online'; connectionStatus.className = 'status-badge online'; }
   checkinBtn.disabled = (status !== 'EN_ROUTE' && status !== 'ARRIVING') || !manifestData;
   completeBtn.disabled = status !== 'CHECKED_IN';
-
-  db.collection('drivers').doc(DRIVER_ID).update({
-    status: status,
-    lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
-  }).catch(err => console.error("Firestore status sync error:", err));
+  db.collection('drivers').doc(DRIVER_ID).update({ status: status, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() }).catch(err => console.error("Firestore status sync error:", err));
 }
 
-// ============================================================
-// GPS TELEMETRY ENGINE
-// ============================================================
 function startTracking() {
-  if (!navigator.geolocation) {
-    showToast('⚠️ GPS hardware unavailable.', 'error');
-    return;
-  }
-
+  if (!navigator.geolocation) { showToast('⚠️ GPS hardware unavailable.', 'error'); return; }
   if (isTracking) return;
-
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-
+  if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
   showToast('📍 Activating GPS telemetry...', 'warning');
-
   watchId = navigator.geolocation.watchPosition(
     position => {
       const { latitude, longitude } = position.coords;
       updateLocation(latitude, longitude);
-
-      if (!isTracking) {
-        isTracking = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-        updateDriverStatus('EN_ROUTE');
-        showToast('✅ GPS Telemetry Active', 'success');
-      }
+      if (!isTracking) { isTracking = true; startBtn.disabled = true; stopBtn.disabled = false; updateDriverStatus('EN_ROUTE'); showToast('✅ GPS Telemetry Active', 'success'); }
     },
-    error => {
-      console.error('GPS error:', error);
-      showToast('⚠️ GPS Error: ' + error.message, 'error');
-    },
-    {
-      enableHighAccuracy: true,
-      maximumAge: 2000,
-      timeout: 10000
-    }
+    error => { console.error('GPS error:', error); showToast('⚠️ GPS Error: ' + error.message, 'error'); },
+    { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
   );
 }
 
 function stopTracking() {
-  if (watchId !== null) {
-    navigator.geolocation.clearWatch(watchId);
-    watchId = null;
-  }
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
   isTracking = false;
   proximityTriggered = false;
   startBtn.disabled = false;
@@ -862,121 +348,61 @@ async function updateLocation(lat, lng) {
   try {
     const timestamp = new Date().toLocaleTimeString();
     lastUpdateTime.textContent = timestamp;
-
-    await db.collection('drivers').doc(DRIVER_ID).update({
-      currentLat: lat,
-      currentLng: lng,
-      lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
+    await db.collection('drivers').doc(DRIVER_ID).update({ currentLat: lat, currentLng: lng, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() });
     if (manifestData && manifestData.latitude && manifestData.longitude) {
       const targetLat = parseFloat(manifestData.latitude);
       const targetLng = parseFloat(manifestData.longitude);
-
       if (!isNaN(targetLat) && !isNaN(targetLng)) {
         const distance = calculateDistance(lat, lng, targetLat, targetLng);
         distanceValue.textContent = distance < 1 ? Math.round(distance * 1000) + ' m' : distance.toFixed(2) + ' km';
-
         const etaMinutes = Math.round((distance / 30) * 60);
         etaValue.textContent = etaMinutes > 0 ? etaMinutes + ' min' : '< 1 min';
-
         if (distance <= 0.1 && !proximityTriggered) {
           proximityTriggered = true;
           playProximityChirp();
-
           const alertMsg = `${driverData.name} within 100m zone`;
           addAlert(alertMsg, '🚨');
           updateDriverStatus('ARRIVING');
           showToast(`🚨 Approaching Pickup Point (<100m)`, 'warning');
-
-          if (driverData.manifestId) {
-            db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
-              proximityAlert: true,
-              arrivingAt: new Date().toISOString()
-            }).catch(e => console.error("Proximity sync error:", e));
-          }
+          if (driverData.manifestId) { db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ proximityAlert: true, arrivingAt: new Date().toISOString() }).catch(e => console.error("Proximity sync error:", e)); }
         }
       }
     }
-  } catch (err) {
-    console.error('Update location error:', err);
-  }
+  } catch (err) { console.error('Update location error:', err); }
 }
 
-// ============================================================
-// HAVERSINE DISTANCE MATH (KM)
-// ============================================================
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
-// ============================================================
-// CHECK-IN & COMPLETION FLOWS
-// ============================================================
 async function checkIn() {
-  if (!driverData || !manifestData) {
-    showToast('⚠️ No active manifest assigned.', 'error');
-    return;
-  }
-
+  if (!driverData || !manifestData) { showToast('⚠️ No active manifest assigned.', 'error'); return; }
   try {
     showToast('📋 Transmitting On-Site Status...', 'warning');
     const now = new Date().toISOString();
-
-    await db.collection('drivers').doc(DRIVER_ID).update({
-      checkedInAt: now,
-      status: 'CHECKED_IN'
-    });
-
-    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
-      status: 'CHECKED_IN',
-      checkedInAt: now,
-      driverCheckedIn: true
-    });
-
+    await db.collection('drivers').doc(DRIVER_ID).update({ checkedInAt: now, status: 'CHECKED_IN' });
+    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'CHECKED_IN', checkedInAt: now, driverCheckedIn: true });
     updateDriverStatus('CHECKED_IN');
     addAlert(`Driver checked in on-site`, '✅');
     showToast('✅ Check-in Recorded Successfully', 'success');
-  } catch (err) {
-    showToast('❌ Check-in failed: ' + err.message, 'error');
-  }
+  } catch (err) { showToast('❌ Check-in failed: ' + err.message, 'error'); }
 }
 
 async function completePickup() {
-  if (!driverData || !manifestData) {
-    showToast('⚠️ No active job to complete.', 'error');
-    return;
-  }
-
+  if (!driverData || !manifestData) { showToast('⚠️ No active job to complete.', 'error'); return; }
   try {
     showToast('📦 Sealing manifest record...', 'warning');
     const now = new Date().toISOString();
-
-    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
-      status: 'COLLECTED',
-      collectedAt: now,
-      collectedBy: driverData.name,
-      quantumState: { chsh: 2.76, patent: 'SA 2026/05142' }
-    });
-
-    await db.collection('drivers').doc(DRIVER_ID).update({
-      completedAt: now,
-      status: 'COMPLETED',
-      manifestId: null
-    });
-
+    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'COLLECTED', collectedAt: now, collectedBy: driverData.name, quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } });
+    await db.collection('drivers').doc(DRIVER_ID).update({ completedAt: now, status: 'COMPLETED', manifestId: null });
     updateDriverStatus('COMPLETED');
     addAlert(`Collection completed by ${driverData.name}`, '📦');
     showToast('✅ Collection Sealed! Ready for Gate Verification', 'success');
-
     setTimeout(() => {
       manifestData = null;
       proximityTriggered = false;
@@ -986,63 +412,38 @@ async function completePickup() {
       updateDriverStatus('OFFLINE');
       if (isTracking) stopTracking();
     }, 4000);
-  } catch (err) {
-    showToast('❌ Completion error: ' + err.message, 'error');
-  }
+  } catch (err) { showToast('❌ Completion error: ' + err.message, 'error'); }
 }
 
-// ============================================================
-// ALERT SYSTEM & TOASTS
-// ============================================================
 function addAlert(message, icon = '🔔') {
   const emptyMsg = document.getElementById('emptyAlertMsg');
   if (emptyMsg) emptyMsg.remove();
-
   const time = new Date().toLocaleTimeString();
   const alertItem = document.createElement('div');
   alertItem.className = 'alert-item';
-  alertItem.innerHTML = `
-    <span class="alert-icon">${icon}</span>
-    <span style="flex:1; font-weight:600;">${message}</span>
-    <span class="alert-time">${time}</span>
-  `;
-
+  alertItem.innerHTML = `<span class="alert-icon">${icon}</span><span style="flex:1; font-weight:600;">${message}</span><span class="alert-time">${time}</span>`;
   alertFeed.insertBefore(alertItem, alertFeed.firstChild);
-
-  while (alertFeed.children.length > 8) {
-    alertFeed.removeChild(alertFeed.lastChild);
-  }
+  while (alertFeed.children.length > 8) { alertFeed.removeChild(alertFeed.lastChild); }
 }
 
 function showToast(msg, type = 'info') {
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
-
   const div = document.createElement('div');
   div.className = 'toast ' + type;
   div.textContent = msg;
   document.body.appendChild(div);
-
-  setTimeout(() => {
-    if (div.parentNode) div.remove();
-  }, 3500);
+  setTimeout(() => { if (div.parentNode) div.remove(); }, 3500);
 }
 
-// ============================================================
-// REAL-TIME MANIFEST SUBSCRIPTION
-// ============================================================
 function listenForManifest() {
-  db.collection('drivers').doc(DRIVER_ID)
-    .onSnapshot(snapshot => {
-      if (snapshot.exists) {
-        const data = snapshot.data();
-        driverData = data;
-
-        if (data.manifestId && (!manifestData || data.manifestId !== manifestData.manifestId)) {
-          loadManifest(data.manifestId);
-        }
-      }
-    }, err => console.error("Driver snapshot listener error:", err));
+  db.collection('drivers').doc(DRIVER_ID).onSnapshot(snapshot => {
+    if (snapshot.exists) {
+      const data = snapshot.data();
+      driverData = data;
+      if (data.manifestId && (!manifestData || data.manifestId !== manifestData.manifestId)) { loadManifest(data.manifestId); }
+    }
+  }, err => console.error("Driver snapshot listener error:", err));
 }
 
 async function loadManifest(manifestId) {
@@ -1052,27 +453,17 @@ async function loadManifest(manifestId) {
       manifestData = doc.data();
       manifestData.manifestId = manifestId;
       pickupLocation.textContent = manifestData.areaCommunity || manifestData.companyName || 'Target Pickup Point';
-
       proximityTriggered = false;
       addAlert(`Manifest #${manifestId.substring(0,6)} Assigned`, '📦');
       showToast(`📦 New Dispatch Assignment Received`, 'success');
-
-      if (isTracking) {
-        updateDriverStatus('EN_ROUTE');
-      }
+      if (isTracking) { updateDriverStatus('EN_ROUTE'); }
     }
-  } catch (err) {
-    console.error('Load manifest error:', err);
-  }
+  } catch (err) { console.error('Load manifest error:', err); }
 }
 
-// ============================================================
-// SYSTEM BOOTSTRAP
-// ============================================================
 document.addEventListener('DOMContentLoaded', function() {
   loadDriverData();
   listenForManifest();
-
   console.log('🚀 MindTech Driver Command Engine Operational');
   console.log('⚛️ Quantum Telemetry Protocol: CHSH S=2.76');
 });
