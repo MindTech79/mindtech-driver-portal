@@ -15,6 +15,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
   <style>
     :root {
@@ -157,12 +158,11 @@
       <i class="fas fa-shield-alt" style="color: var(--accent-rose);"></i>
       <h3 style="font-size: 0.9rem;">Sobriety Check</h3>
     </div>
-    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Take a selfie at the start of your shift.</p>
-    <div class="form-group">
-      <label>Selfie</label>
-      <input type="file" id="sobrietyPhotoInput" accept="image/*" capture="user">
-    </div>
-    <button class="btn btn-start" onclick="uploadSobrietyCheck()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Sobriety Check</button>
+    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Tap below to open camera. Photo uploads automatically.</p>
+    <input type="file" id="sobrietyPhotoInput" accept="image/*" capture="user" style="display: none;">
+    <button class="btn btn-start" onclick="document.getElementById('sobrietyPhotoInput').click()" style="width:100%; padding:10px; font-size:0.75rem;">
+        <i class="fas fa-camera"></i> Take Sobriety Selfie
+    </button>
   </div>
 
   <!-- PROOF: FUEL RECEIPT & ODOMETER -->
@@ -175,11 +175,10 @@
       <label>Odometer Reading (km)</label>
       <input type="number" id="odometerKm" placeholder="e.g. 145230">
     </div>
-    <div class="form-group">
-      <label>Fuel Receipt Photo</label>
-      <input type="file" id="fuelReceiptInput" accept="image/*" capture="environment">
-    </div>
-    <button class="btn btn-checkin" onclick="uploadFuelProof()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Fuel Proof</button>
+    <input type="file" id="fuelReceiptInput" accept="image/*" capture="environment" style="display: none;">
+    <button class="btn btn-checkin" onclick="document.getElementById('fuelReceiptInput').click()" style="width:100%; padding:10px; font-size:0.75rem;">
+        <i class="fas fa-camera"></i> Capture Fuel Receipt
+    </button>
   </div>
 
   <!-- PROOF: DELIVERY DOCUMENT -->
@@ -188,11 +187,11 @@
       <i class="fas fa-file-signature" style="color: var(--accent-green);"></i>
       <h3 style="font-size: 0.9rem;">Delivery Document</h3>
     </div>
-    <div class="form-group">
-      <label>Recipient Signature Photo</label>
-      <input type="file" id="deliveryDocInput" accept="image/*" capture="environment">
-    </div>
-    <button class="btn btn-complete" onclick="uploadDeliveryProof()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Delivery Proof</button>
+    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Capture the signed delivery note.</p>
+    <input type="file" id="deliveryDocInput" accept="image/*" capture="environment" style="display: none;">
+    <button class="btn btn-complete" onclick="document.getElementById('deliveryDocInput').click()" style="width:100%; padding:10px; font-size:0.75rem;">
+        <i class="fas fa-camera"></i> Capture Delivery Note
+    </button>
   </div>
 
   <div class="tracking-controls">
@@ -218,27 +217,20 @@
 <!-- HANDSHAKE -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('[Handshake] Script loaded, waiting for DOM...');
     const badge = document.getElementById('handshakeBadge');
-    if (!badge) { console.error('[Handshake] ❌ #handshakeBadge not found'); return; }
-    badge.className = 'handshake-badge';
+    if (!badge) return;
     badge.innerHTML = '<i class="fas fa-satellite-dish"></i> Handshake: Pending...';
 
     (async function runHandshake() {
       try {
-        try {
-          await fetch('https://pelo-complete.onrender.com/health', { method: 'GET', signal: AbortSignal.timeout(5000) });
-        } catch (e) { console.log('[Handshake] Warm-up sent (cold start)'); }
-
+        await fetch('https://pelo-complete.onrender.com/health', { method: 'GET', signal: AbortSignal.timeout(5000) }).catch(() => {});
         const res = await fetch('https://pelo-complete.onrender.com/api/v1/verify/chsh', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(30000)
         });
-
         if (res.ok) {
           const data = await res.json();
-          console.log('[Handshake] ✅ CHSH Confirmed:', data.S);
           badge.className = 'handshake-badge confirmed';
           badge.innerHTML = `<i class="fas fa-check-circle"></i> Handshake: CONFIRMED (S=${data.S || 2.76})`;
         } else {
@@ -269,6 +261,7 @@
   }
 
   const db = firebase.firestore();
+  const storage = firebase.storage();
   db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
   db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
 
@@ -448,55 +441,77 @@
   }
 
   // ============================================================
-  // PROOF UPLOAD FUNCTIONS
+  // PROOF UPLOAD — AUTO CAMERA TO FIREBASE STORAGE
   // ============================================================
-  async function uploadProof(fileInputId, proofType) {
+  async function handleProofCapture(fileInputId, proofType) {
     const input = document.getElementById(fileInputId);
     const file = input.files[0];
-    if (!file) { showToast('⚠️ Please select a photo first.', 'warning'); return; }
 
-    const proofRecord = {
-      type: proofType,
-      driverId: DRIVER_ID,
-      timestamp: new Date().toISOString(),
-      latitude: driverData ? driverData.currentLat : null,
-      longitude: driverData ? driverData.currentLng : null,
-      fileName: file.name,
-      fileSize: file.size,
-      chsh_s: '2.76',
-      patent: 'SA 2026/05142'
-    };
+    if (!file) {
+      showToast('⚠️ No photo captured. Please try again.', 'warning');
+      return;
+    }
+
+    showToast(`⏳ Uploading ${proofType}...`, 'info');
 
     try {
+      // 1. Upload to Firebase Storage
+      const storageRef = storage.ref(`proofs/${DRIVER_ID}/${proofType}_${Date.now()}_${file.name}`);
+      const snapshot = await storageRef.put(file);
+      const downloadURL = await snapshot.ref.getDownloadURL();
+
+      // 2. Log metadata to Firestore
+      const proofRecord = {
+        type: proofType,
+        driverId: DRIVER_ID,
+        timestamp: new Date().toISOString(),
+        latitude: driverData ? driverData.currentLat : null,
+        longitude: driverData ? driverData.currentLng : null,
+        fileName: file.name,
+        fileSize: file.size,
+        downloadURL: downloadURL,
+        chsh_s: '2.76',
+        patent: 'SA 2026/05142'
+      };
+
       await db.collection('driver_proofs').add(proofRecord);
-      addAlert(`📸 ${proofType} proof uploaded`, '✅');
-      showToast(`✅ ${proofType} proof saved!`, 'success');
-    } catch (e) {
-      console.warn('Firestore proof save failed:', e);
-      showToast(`⚠️ ${proofType} proof logged locally.`, 'warning');
+
+      // 3. If this is a fuel proof, also update the manifest
+      if (proofType === 'Fuel Receipt') {
+        const odometer = document.getElementById('odometerKm').value;
+        if (odometer && driverData && driverData.manifestId) {
+          await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
+            fuelOdometerKm: parseInt(odometer),
+            fuelReceiptURL: downloadURL,
+            fuelReceiptAt: new Date().toISOString()
+          });
+        }
+      }
+
+      addAlert(`📸 ${proofType} uploaded`, '✅');
+      showToast(`✅ ${proofType} uploaded successfully!`, 'success');
+
+    } catch (error) {
+      console.error('Proof upload error:', error);
+      showToast(`❌ Upload failed: ${error.message}`, 'error');
+      addAlert(`❌ ${proofType} upload failed`, '❌');
     }
+
     input.value = '';
   }
 
-  function uploadFuelProof() {
-    const odometer = document.getElementById('odometerKm').value;
-    if (!odometer) { showToast('⚠️ Please enter the odometer reading.', 'warning'); return; }
-    uploadProof('fuelReceiptInput', 'Fuel Receipt');
-    if (driverData && driverData.manifestId) {
-      db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
-        fuelOdometerKm: parseInt(odometer),
-        fuelReceiptAt: new Date().toISOString()
-      }).catch(e => console.warn('Odometer save failed:', e));
-    }
-  }
+  // Attach event listeners to the hidden file inputs
+  document.getElementById('sobrietyPhotoInput').addEventListener('change', function() {
+    handleProofCapture('sobrietyPhotoInput', 'Sobriety Check');
+  });
 
-  function uploadDeliveryProof() {
-    uploadProof('deliveryDocInput', 'Delivery Document');
-  }
+  document.getElementById('fuelReceiptInput').addEventListener('change', function() {
+    handleProofCapture('fuelReceiptInput', 'Fuel Receipt');
+  });
 
-  function uploadSobrietyCheck() {
-    uploadProof('sobrietyPhotoInput', 'Sobriety Check');
-  }
+  document.getElementById('deliveryDocInput').addEventListener('change', function() {
+    handleProofCapture('deliveryDocInput', 'Delivery Document');
+  });
 
   function addAlert(message, icon = '🔔') {
     const emptyMsg = document.getElementById('emptyAlertMsg');
