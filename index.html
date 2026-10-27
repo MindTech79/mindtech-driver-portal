@@ -91,11 +91,24 @@
     .alert-time { color: var(--text-muted); font-size: 9px; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
     .footer { text-align: center; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--card-border); font-size: 10px; color: var(--text-muted); font-family: 'Exo 2', sans-serif; }
     .footer .quantum { color: var(--accent-purple); font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.5px; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #0f172a; color: var(--text-primary); padding: 12px 20px; border-radius: 30px; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 700; font-size: 12px; z-index: 99999; max-width: 88%; text-align: center; animation: slideUp 0.25s cubic-bezier(0, 0, 0.2, 1); font-family: 'Exo 2', sans-serif; }
+    .toast { position: fixed; bottom: max(16px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 28px); min-width: 0; background: #0f172a; color: var(--text-primary); padding: 12px 16px; border-radius: 18px; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.8); font-weight: 700; font-size: 13px; line-height: 1.4; z-index: 99999; text-align: center; white-space: normal; overflow-wrap: anywhere; word-break: break-word; animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Exo 2', sans-serif; }
     .toast.success { border-color: var(--accent-green); color: var(--accent-green); }
     .toast.error { border-color: var(--accent-rose); color: var(--accent-rose); }
     .toast.warning { border-color: var(--accent-amber); color: var(--accent-amber); }
     @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @media (max-width: 480px) {
+      body { padding: 12px 10px calc(24px + env(safe-area-inset-bottom)); }
+      .toast { width: calc(100vw - 28px); max-width: calc(100vw - 28px); padding: 12px 14px; border-radius: 16px; font-size: 12px; }
+      .header { gap: 8px; padding: 10px 12px; }
+      .header-left { min-width: 0; gap: 8px; }
+      .header h1 { font-size: 14px; overflow-wrap: anywhere; }
+      .status-badge, .handshake-badge { max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+      .profile-info { min-width: 0; }
+      .profile-info h2, .profile-info p { overflow-wrap: anywhere; }
+      .job-details { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .preview-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .btn { min-width: 0; white-space: normal; line-height: 1.25; }
+    }
     .handshake-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; border: 1px solid var(--accent-amber); color: var(--accent-amber); background: rgba(245, 158, 11, 0.08); transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
     .handshake-badge.confirmed { border-color: var(--accent-green); color: var(--accent-green); background: rgba(16, 185, 129, 0.08); }
     .handshake-badge.unreachable { border-color: var(--accent-rose); color: var(--accent-rose); background: rgba(244, 63, 94, 0.08); }
@@ -284,14 +297,12 @@
   }
 
   // ============================================================
-  // ANONYMOUS AUTHENTICATION — SILENT LOGIN
+  // AUTHENTICATION — INITIALIZATION IS GATED BY AUTH STATE
   // ============================================================
   const auth = firebase.auth();
   let authReady = false;
-
-  auth.signInAnonymously()
-    .then(() => { console.log('✅ Anonymous auth successful.'); })
-    .catch((error) => { console.error('❌ Anonymous auth failed:', error.message); });
+  let appInitializationStarted = false;
+  let authInitializationSignInInProgress = false;
 
   const db = firebase.firestore();
   const storage = firebase.storage();
@@ -357,7 +368,11 @@
       } else {
         const initialProfile = { driverId: DRIVER_ID, name: 'Thabo Mokoena', phone: '082 555 1234', vehicle: 'Toyota Hilux (ZX 1234)', status: 'OFFLINE', createdAt: new Date().toISOString(), quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } };
         await db.collection('drivers').doc(DRIVER_ID).set(initialProfile);
-        loadDriverData();
+        driverData = initialProfile;
+        document.getElementById('driverName').textContent = initialProfile.name;
+        document.getElementById('driverPhone').textContent = '📞 ' + initialProfile.phone;
+        document.getElementById('driverVehicle').textContent = '🚗 ' + initialProfile.vehicle;
+        document.getElementById('avatarInitials').textContent = 'TM';
       }
     } catch (err) { console.error('Load driver error:', err); showToast('⚠️ Driver profile load failed', 'error'); }
   }
@@ -566,7 +581,8 @@
 
     } catch (error) {
       console.error('Proof upload error:', error);
-      showToast(`❌ Upload failed: ${error.message}`, 'error');
+      const storageDenied = error && (error.code === 'storage/unauthorized' || /permission|unauthoriz/i.test(error.message || ''));
+      showToast(storageDenied ? '❌ Upload blocked by Firebase Storage permissions. Contact the administrator.' : `❌ Upload failed: ${error.message || 'Please try again.'}`, 'error');
       addAlert(`❌ ${proofType} upload failed`, '❌');
     }
 
@@ -627,6 +643,15 @@
   }
 
   async function loadManifest(manifestId) {
+    if (!auth.currentUser) {
+      console.warn('Manifest load skipped: Firebase Auth is not ready.');
+      return;
+    }
+    if (!manifestId) {
+      console.warn('Manifest load skipped: no manifestId was supplied.');
+      return;
+    }
+
     try {
       const doc = await db.collection('pelo_master_ledger').doc(manifestId).get();
       if (doc.exists) {
@@ -642,19 +667,45 @@
   }
 
   // ============================================================
-  // WAIT FOR AUTH BEFORE LOADING DATA
+  // WAIT FOR AUTH BEFORE LOADING FIRESTORE DATA
   // ============================================================
   document.addEventListener('DOMContentLoaded', function() {
-    auth.onAuthStateChanged((user) => {
-      if (user && !authReady) {
+    auth.onAuthStateChanged(async (user) => {
+      try {
+        // Do not query Firestore until Firebase has confirmed a signed-in user.
+        if (!user) {
+          if (authInitializationSignInInProgress) return;
+          authInitializationSignInInProgress = true;
+          try {
+            await auth.signInAnonymously();
+            console.log('✅ Anonymous authentication requested.');
+          } catch (error) {
+            authInitializationSignInInProgress = false;
+            console.error('❌ Anonymous auth failed:', error.code || error.message, error);
+            showToast('❌ Sign-in failed. Check Firebase Anonymous provider.', 'error');
+          }
+          return;
+        }
+
+        authInitializationSignInInProgress = false;
+        if (appInitializationStarted) return;
+
+        appInitializationStarted = true;
         authReady = true;
-        console.log('✅ Auth ready. Loading driver data...');
-        loadDriverData();
+        console.log('✅ Auth ready. UID:', user.uid, 'Anonymous:', user.isAnonymous);
+
+        await loadDriverData();
         listenForManifest();
+
+        console.log('🚀 MindTech Driver Command Engine Fully Initialized');
+      } catch (error) {
+        appInitializationStarted = false;
+        console.error('❌ Initialization error:', error.code || error.message, error);
+        showToast('⚠️ Driver initialization failed: ' + (error.code || error.message), 'error');
       }
     });
 
-    console.log('🚀 MindTech Driver Command Engine Operational');
+    console.log('🚀 MindTech Driver Command Engine Starting');
     console.log('⚛️ Quantum Telemetry Protocol: CHSH S=2.76');
   });
 </script>
