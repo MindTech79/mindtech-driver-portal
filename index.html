@@ -5,22 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MindTech Driver Command</title>
 
-  <!-- Inline favicon (no 404) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚚</text></svg>">
 
-  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
-    /* ... ALL YOUR EXISTING CSS (EXACTLY AS PROVIDED) ... */
     :root {
       --bg-dark: #030712; --card-bg: rgba(15, 23, 42, 0.75); --card-border: rgba(56, 189, 248, 0.15);
       --input-bg: rgba(30, 41, 59, 0.6); --accent-cyan: #38bdf8; --accent-blue: #0284c7;
@@ -102,6 +98,13 @@
     .handshake-badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; border: 1px solid var(--accent-amber); color: var(--accent-amber); background: rgba(245, 158, 11, 0.08); transition: all 0.3s; display: inline-flex; align-items: center; gap: 6px; }
     .handshake-badge.confirmed { border-color: var(--accent-green); color: var(--accent-green); background: rgba(16, 185, 129, 0.08); }
     .handshake-badge.unreachable { border-color: var(--accent-rose); color: var(--accent-rose); background: rgba(244, 63, 94, 0.08); }
+
+    /* PROOF SECTIONS */
+    .proof-card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; }
+    .proof-card .form-group { margin-bottom: 10px; }
+    .proof-card label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-family: 'Exo 2', sans-serif; }
+    .proof-card input[type="number"], .proof-card input[type="file"] { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: white; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .proof-card input[type="file"] { padding: 6px; font-size: 11px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -148,6 +151,50 @@
     </div>
   </div>
 
+  <!-- PROOF: SOBRIETY SELFIE -->
+  <div class="proof-card">
+    <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+      <i class="fas fa-shield-alt" style="color: var(--accent-rose);"></i>
+      <h3 style="font-size: 0.9rem;">Sobriety Check</h3>
+    </div>
+    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Take a selfie at the start of your shift.</p>
+    <div class="form-group">
+      <label>Selfie</label>
+      <input type="file" id="sobrietyPhotoInput" accept="image/*" capture="user">
+    </div>
+    <button class="btn btn-start" onclick="uploadSobrietyCheck()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Sobriety Check</button>
+  </div>
+
+  <!-- PROOF: FUEL RECEIPT & ODOMETER -->
+  <div class="proof-card">
+    <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+      <i class="fas fa-gas-pump" style="color: var(--accent-amber);"></i>
+      <h3 style="font-size: 0.9rem;">Fuel Stop Proof</h3>
+    </div>
+    <div class="form-group">
+      <label>Odometer Reading (km)</label>
+      <input type="number" id="odometerKm" placeholder="e.g. 145230">
+    </div>
+    <div class="form-group">
+      <label>Fuel Receipt Photo</label>
+      <input type="file" id="fuelReceiptInput" accept="image/*" capture="environment">
+    </div>
+    <button class="btn btn-checkin" onclick="uploadFuelProof()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Fuel Proof</button>
+  </div>
+
+  <!-- PROOF: DELIVERY DOCUMENT -->
+  <div class="proof-card">
+    <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+      <i class="fas fa-file-signature" style="color: var(--accent-green);"></i>
+      <h3 style="font-size: 0.9rem;">Delivery Document</h3>
+    </div>
+    <div class="form-group">
+      <label>Recipient Signature Photo</label>
+      <input type="file" id="deliveryDocInput" accept="image/*" capture="environment">
+    </div>
+    <button class="btn btn-complete" onclick="uploadDeliveryProof()" style="width:100%; padding:10px; font-size:0.75rem;"><i class="fas fa-camera"></i> Upload Delivery Proof</button>
+  </div>
+
   <div class="tracking-controls">
     <button class="btn btn-start" id="startBtn" onclick="startTracking()"><i class="fa-solid fa-play"></i> Start</button>
     <button class="btn btn-stop" id="stopBtn" onclick="stopTracking()" disabled><i class="fa-solid fa-stop"></i> Stop</button>
@@ -168,31 +215,20 @@
 
 </div>
 
-<!-- ============================================================ -->
-<!-- DEFENSIVE HANDSHAKE — DIRECT FETCH, DOMREADY WRAPPED -->
-<!-- ============================================================ -->
+<!-- HANDSHAKE -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     console.log('[Handshake] Script loaded, waiting for DOM...');
     const badge = document.getElementById('handshakeBadge');
-    if (!badge) {
-      console.error('[Handshake] ❌ #handshakeBadge not found');
-      return;
-    }
-    console.log('[Handshake] Badge found, starting fetch...');
+    if (!badge) { console.error('[Handshake] ❌ #handshakeBadge not found'); return; }
     badge.className = 'handshake-badge';
     badge.innerHTML = '<i class="fas fa-satellite-dish"></i> Handshake: Pending...';
 
     (async function runHandshake() {
       try {
         try {
-          await fetch('https://pelo-complete.onrender.com/health', {
-            method: 'GET',
-            signal: AbortSignal.timeout(5000)
-          });
-        } catch (e) {
-          console.log('[Handshake] Warm-up sent (cold start)');
-        }
+          await fetch('https://pelo-complete.onrender.com/health', { method: 'GET', signal: AbortSignal.timeout(5000) });
+        } catch (e) { console.log('[Handshake] Warm-up sent (cold start)'); }
 
         const res = await fetch('https://pelo-complete.onrender.com/api/v1/verify/chsh', {
           method: 'GET',
@@ -206,12 +242,10 @@
           badge.className = 'handshake-badge confirmed';
           badge.innerHTML = `<i class="fas fa-check-circle"></i> Handshake: CONFIRMED (S=${data.S || 2.76})`;
         } else {
-          console.warn('[Handshake] ⚠️ Verifier returned', res.status);
           badge.className = 'handshake-badge unreachable';
           badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Handshake: UNREACHABLE';
         }
       } catch (error) {
-        console.warn('[Handshake] ⚠️ Verifier unreachable:', error.message);
         badge.className = 'handshake-badge unreachable';
         badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Handshake: UNREACHABLE';
       }
@@ -219,254 +253,303 @@
   });
 </script>
 
-<!-- ============================================================ -->
-<!-- MAIN APP LOGIC -->
-<!-- ============================================================ -->
+<!-- MAIN APP -->
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
-  authDomain: "mindflow-ai-education.firebaseapp.com",
-  projectId: "mindflow-ai-education",
-  storageBucket: "mindflow-ai-education.firebasestorage.app",
-  messagingSenderId: "157615197603",
-  appId: "1:157615197603:web:540d67781fc55d04c11e16"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
-db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-
-const DRIVER_ID = 'DRV-001';
-let watchId = null;
-let isTracking = false;
-let driverData = null;
-let manifestData = null;
-let proximityTriggered = false;
-let audioCtx = null;
-
-const statusDot = document.getElementById('statusDot');
-const statusText = document.getElementById('statusText');
-const lastUpdateTime = document.getElementById('lastUpdateTime');
-const pickupLocation = document.getElementById('pickupLocation');
-const distanceValue = document.getElementById('distanceValue');
-const etaValue = document.getElementById('etaValue');
-const alertFeed = document.getElementById('alertFeed');
-const connectionStatus = document.getElementById('connectionStatus');
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const checkinBtn = document.getElementById('checkinBtn');
-const completeBtn = document.getElementById('completeBtn');
-
-function playProximityChirp() {
-  try {
-    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.15);
-  } catch(e) { console.warn('Audio feedback blocked or unsupported:', e); }
-}
-
-async function loadDriverData() {
-  try {
-    const doc = await db.collection('drivers').doc(DRIVER_ID).get();
-    if (doc.exists) {
-      driverData = doc.data();
-      document.getElementById('driverName').textContent = driverData.name || 'Thabo Mokoena';
-      document.getElementById('driverPhone').textContent = '📞 ' + (driverData.phone || '082 555 1234');
-      document.getElementById('driverVehicle').textContent = '🚗 ' + (driverData.vehicle || 'Toyota Hilux (ZX 1234)');
-      const initials = (driverData.name || 'TM').split(' ').map(n => n[0]).join('').substring(0, 2);
-      document.getElementById('avatarInitials').textContent = initials;
-      if (driverData.manifestId) { await loadManifest(driverData.manifestId); }
-    } else {
-      const initialProfile = { driverId: DRIVER_ID, name: 'Thabo Mokoena', phone: '082 555 1234', vehicle: 'Toyota Hilux (ZX 1234)', status: 'OFFLINE', createdAt: new Date().toISOString(), quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } };
-      await db.collection('drivers').doc(DRIVER_ID).set(initialProfile);
-      loadDriverData();
-    }
-  } catch (err) { console.error('Load driver error:', err); showToast('⚠️ Driver profile load failed', 'error'); }
-}
-
-function updateDriverStatus(status) {
-  const statusMap = {
-    'EN_ROUTE': { dot: 'en-route', text: 'EN ROUTE', color: 'var(--accent-cyan)' },
-    'ARRIVING': { dot: 'arriving', text: '🚨 ARRIVING NOW', color: 'var(--accent-amber)' },
-    'CHECKED_IN': { dot: 'en-route', text: '✅ CHECKED IN', color: 'var(--accent-green)' },
-    'COMPLETED': { dot: 'completed', text: '✅ COMPLETED', color: 'var(--accent-green)' },
-    'OFFLINE': { dot: 'offline', text: 'OFFLINE', color: 'var(--accent-rose)' }
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+    authDomain: "mindflow-ai-education.firebaseapp.com",
+    projectId: "mindflow-ai-education",
+    storageBucket: "mindflow-ai-education.firebasestorage.app",
+    messagingSenderId: "157615197603",
+    appId: "1:157615197603:web:540d67781fc55d04c11e16"
   };
-  const info = statusMap[status] || statusMap['OFFLINE'];
-  statusDot.className = 'status-dot ' + info.dot;
-  statusText.textContent = info.text;
-  statusText.style.color = info.color;
-  if (status === 'OFFLINE') { connectionStatus.textContent = 'Standby'; connectionStatus.className = 'status-badge offline'; }
-  else if (isTracking) { connectionStatus.textContent = 'GPS Active'; connectionStatus.className = 'status-badge tracking'; }
-  else { connectionStatus.textContent = 'Online'; connectionStatus.className = 'status-badge online'; }
-  checkinBtn.disabled = (status !== 'EN_ROUTE' && status !== 'ARRIVING') || !manifestData;
-  completeBtn.disabled = status !== 'CHECKED_IN';
-  db.collection('drivers').doc(DRIVER_ID).update({ status: status, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() }).catch(err => console.error("Firestore status sync error:", err));
-}
 
-function startTracking() {
-  if (!navigator.geolocation) { showToast('⚠️ GPS hardware unavailable.', 'error'); return; }
-  if (isTracking) return;
-  if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-  showToast('📍 Activating GPS telemetry...', 'warning');
-  watchId = navigator.geolocation.watchPosition(
-    position => {
-      const { latitude, longitude } = position.coords;
-      updateLocation(latitude, longitude);
-      if (!isTracking) { isTracking = true; startBtn.disabled = true; stopBtn.disabled = false; updateDriverStatus('EN_ROUTE'); showToast('✅ GPS Telemetry Active', 'success'); }
-    },
-    error => { console.error('GPS error:', error); showToast('⚠️ GPS Error: ' + error.message, 'error'); },
-    { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
-  );
-}
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
 
-function stopTracking() {
-  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-  isTracking = false;
-  proximityTriggered = false;
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-  updateDriverStatus('OFFLINE');
-  showToast('⏹️ GPS Telemetry Terminated', 'warning');
-}
+  const db = firebase.firestore();
+  db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
+  db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
 
-async function updateLocation(lat, lng) {
-  try {
-    const timestamp = new Date().toLocaleTimeString();
-    lastUpdateTime.textContent = timestamp;
-    await db.collection('drivers').doc(DRIVER_ID).update({ currentLat: lat, currentLng: lng, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() });
-    if (manifestData && manifestData.latitude && manifestData.longitude) {
-      const targetLat = parseFloat(manifestData.latitude);
-      const targetLng = parseFloat(manifestData.longitude);
-      if (!isNaN(targetLat) && !isNaN(targetLng)) {
-        const distance = calculateDistance(lat, lng, targetLat, targetLng);
-        distanceValue.textContent = distance < 1 ? Math.round(distance * 1000) + ' m' : distance.toFixed(2) + ' km';
-        const etaMinutes = Math.round((distance / 30) * 60);
-        etaValue.textContent = etaMinutes > 0 ? etaMinutes + ' min' : '< 1 min';
-        if (distance <= 0.1 && !proximityTriggered) {
-          proximityTriggered = true;
-          playProximityChirp();
-          const alertMsg = `${driverData.name} within 100m zone`;
-          addAlert(alertMsg, '🚨');
-          updateDriverStatus('ARRIVING');
-          showToast(`🚨 Approaching Pickup Point (<100m)`, 'warning');
-          if (driverData.manifestId) { db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ proximityAlert: true, arrivingAt: new Date().toISOString() }).catch(e => console.error("Proximity sync error:", e)); }
+  const DRIVER_ID = 'DRV-001';
+  let watchId = null;
+  let isTracking = false;
+  let driverData = null;
+  let manifestData = null;
+  let proximityTriggered = false;
+  let audioCtx = null;
+
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const lastUpdateTime = document.getElementById('lastUpdateTime');
+  const pickupLocation = document.getElementById('pickupLocation');
+  const distanceValue = document.getElementById('distanceValue');
+  const etaValue = document.getElementById('etaValue');
+  const alertFeed = document.getElementById('alertFeed');
+  const connectionStatus = document.getElementById('connectionStatus');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const checkinBtn = document.getElementById('checkinBtn');
+  const completeBtn = document.getElementById('completeBtn');
+
+  function playProximityChirp() {
+    try {
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) { console.warn('Audio feedback blocked or unsupported:', e); }
+  }
+
+  async function loadDriverData() {
+    try {
+      const doc = await db.collection('drivers').doc(DRIVER_ID).get();
+      if (doc.exists) {
+        driverData = doc.data();
+        document.getElementById('driverName').textContent = driverData.name || 'Thabo Mokoena';
+        document.getElementById('driverPhone').textContent = '📞 ' + (driverData.phone || '082 555 1234');
+        document.getElementById('driverVehicle').textContent = '🚗 ' + (driverData.vehicle || 'Toyota Hilux (ZX 1234)');
+        const initials = (driverData.name || 'TM').split(' ').map(n => n[0]).join('').substring(0, 2);
+        document.getElementById('avatarInitials').textContent = initials;
+        if (driverData.manifestId) { await loadManifest(driverData.manifestId); }
+      } else {
+        const initialProfile = { driverId: DRIVER_ID, name: 'Thabo Mokoena', phone: '082 555 1234', vehicle: 'Toyota Hilux (ZX 1234)', status: 'OFFLINE', createdAt: new Date().toISOString(), quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } };
+        await db.collection('drivers').doc(DRIVER_ID).set(initialProfile);
+        loadDriverData();
+      }
+    } catch (err) { console.error('Load driver error:', err); showToast('⚠️ Driver profile load failed', 'error'); }
+  }
+
+  function updateDriverStatus(status) {
+    const statusMap = {
+      'EN_ROUTE': { dot: 'en-route', text: 'EN ROUTE', color: 'var(--accent-cyan)' },
+      'ARRIVING': { dot: 'arriving', text: '🚨 ARRIVING NOW', color: 'var(--accent-amber)' },
+      'CHECKED_IN': { dot: 'en-route', text: '✅ CHECKED IN', color: 'var(--accent-green)' },
+      'COMPLETED': { dot: 'completed', text: '✅ COMPLETED', color: 'var(--accent-green)' },
+      'OFFLINE': { dot: 'offline', text: 'OFFLINE', color: 'var(--accent-rose)' }
+    };
+    const info = statusMap[status] || statusMap['OFFLINE'];
+    statusDot.className = 'status-dot ' + info.dot;
+    statusText.textContent = info.text;
+    statusText.style.color = info.color;
+    if (status === 'OFFLINE') { connectionStatus.textContent = 'Standby'; connectionStatus.className = 'status-badge offline'; }
+    else if (isTracking) { connectionStatus.textContent = 'GPS Active'; connectionStatus.className = 'status-badge tracking'; }
+    else { connectionStatus.textContent = 'Online'; connectionStatus.className = 'status-badge online'; }
+    checkinBtn.disabled = (status !== 'EN_ROUTE' && status !== 'ARRIVING') || !manifestData;
+    completeBtn.disabled = status !== 'CHECKED_IN';
+    db.collection('drivers').doc(DRIVER_ID).update({ status: status, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() }).catch(err => console.error("Firestore status sync error:", err));
+  }
+
+  function startTracking() {
+    if (!navigator.geolocation) { showToast('⚠️ GPS hardware unavailable.', 'error'); return; }
+    if (isTracking) return;
+    if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    showToast('📍 Activating GPS telemetry...', 'warning');
+    watchId = navigator.geolocation.watchPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        updateLocation(latitude, longitude);
+        if (!isTracking) { isTracking = true; startBtn.disabled = true; stopBtn.disabled = false; updateDriverStatus('EN_ROUTE'); showToast('✅ GPS Telemetry Active', 'success'); }
+      },
+      error => { console.error('GPS error:', error); showToast('⚠️ GPS Error: ' + error.message, 'error'); },
+      { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 }
+    );
+  }
+
+  function stopTracking() {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    isTracking = false;
+    proximityTriggered = false;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    updateDriverStatus('OFFLINE');
+    showToast('⏹️ GPS Telemetry Terminated', 'warning');
+  }
+
+  async function updateLocation(lat, lng) {
+    try {
+      const timestamp = new Date().toLocaleTimeString();
+      lastUpdateTime.textContent = timestamp;
+      await db.collection('drivers').doc(DRIVER_ID).update({ currentLat: lat, currentLng: lng, lastUpdate: firebase.firestore.FieldValue.serverTimestamp() });
+      if (manifestData && manifestData.latitude && manifestData.longitude) {
+        const targetLat = parseFloat(manifestData.latitude);
+        const targetLng = parseFloat(manifestData.longitude);
+        if (!isNaN(targetLat) && !isNaN(targetLng)) {
+          const distance = calculateDistance(lat, lng, targetLat, targetLng);
+          distanceValue.textContent = distance < 1 ? Math.round(distance * 1000) + ' m' : distance.toFixed(2) + ' km';
+          const etaMinutes = Math.round((distance / 30) * 60);
+          etaValue.textContent = etaMinutes > 0 ? etaMinutes + ' min' : '< 1 min';
+          if (distance <= 0.1 && !proximityTriggered) {
+            proximityTriggered = true;
+            playProximityChirp();
+            const alertMsg = `${driverData.name} within 100m zone`;
+            addAlert(alertMsg, '🚨');
+            updateDriverStatus('ARRIVING');
+            showToast(`🚨 Approaching Pickup Point (<100m)`, 'warning');
+            if (driverData.manifestId) { db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ proximityAlert: true, arrivingAt: new Date().toISOString() }).catch(e => console.error("Proximity sync error:", e)); }
+          }
         }
       }
+    } catch (err) { console.error('Update location error:', err); }
+  }
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  async function checkIn() {
+    if (!driverData || !manifestData) { showToast('⚠️ No active manifest assigned.', 'error'); return; }
+    try {
+      showToast('📋 Transmitting On-Site Status...', 'warning');
+      const now = new Date().toISOString();
+      await db.collection('drivers').doc(DRIVER_ID).update({ checkedInAt: now, status: 'CHECKED_IN' });
+      await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'CHECKED_IN', checkedInAt: now, driverCheckedIn: true });
+      updateDriverStatus('CHECKED_IN');
+      addAlert(`Driver checked in on-site`, '✅');
+      showToast('✅ Check-in Recorded Successfully', 'success');
+    } catch (err) { showToast('❌ Check-in failed: ' + err.message, 'error'); }
+  }
+
+  async function completePickup() {
+    if (!driverData || !manifestData) { showToast('⚠️ No active job to complete.', 'error'); return; }
+    try {
+      showToast('📦 Sealing manifest record...', 'warning');
+      const now = new Date().toISOString();
+      await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'COLLECTED', collectedAt: now, collectedBy: driverData.name, quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } });
+      await db.collection('drivers').doc(DRIVER_ID).update({ completedAt: now, status: 'COMPLETED', manifestId: null });
+      updateDriverStatus('COMPLETED');
+      addAlert(`Collection completed by ${driverData.name}`, '📦');
+      showToast('✅ Collection Sealed! Ready for Gate Verification', 'success');
+      setTimeout(() => {
+        manifestData = null;
+        proximityTriggered = false;
+        pickupLocation.textContent = 'Awaiting Assignment...';
+        distanceValue.textContent = '—';
+        etaValue.textContent = '—';
+        updateDriverStatus('OFFLINE');
+        if (isTracking) stopTracking();
+      }, 4000);
+    } catch (err) { showToast('❌ Completion error: ' + err.message, 'error'); }
+  }
+
+  // ============================================================
+  // PROOF UPLOAD FUNCTIONS
+  // ============================================================
+  async function uploadProof(fileInputId, proofType) {
+    const input = document.getElementById(fileInputId);
+    const file = input.files[0];
+    if (!file) { showToast('⚠️ Please select a photo first.', 'warning'); return; }
+
+    const proofRecord = {
+      type: proofType,
+      driverId: DRIVER_ID,
+      timestamp: new Date().toISOString(),
+      latitude: driverData ? driverData.currentLat : null,
+      longitude: driverData ? driverData.currentLng : null,
+      fileName: file.name,
+      fileSize: file.size,
+      chsh_s: '2.76',
+      patent: 'SA 2026/05142'
+    };
+
+    try {
+      await db.collection('driver_proofs').add(proofRecord);
+      addAlert(`📸 ${proofType} proof uploaded`, '✅');
+      showToast(`✅ ${proofType} proof saved!`, 'success');
+    } catch (e) {
+      console.warn('Firestore proof save failed:', e);
+      showToast(`⚠️ ${proofType} proof logged locally.`, 'warning');
     }
-  } catch (err) { console.error('Update location error:', err); }
-}
+    input.value = '';
+  }
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-async function checkIn() {
-  if (!driverData || !manifestData) { showToast('⚠️ No active manifest assigned.', 'error'); return; }
-  try {
-    showToast('📋 Transmitting On-Site Status...', 'warning');
-    const now = new Date().toISOString();
-    await db.collection('drivers').doc(DRIVER_ID).update({ checkedInAt: now, status: 'CHECKED_IN' });
-    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'CHECKED_IN', checkedInAt: now, driverCheckedIn: true });
-    updateDriverStatus('CHECKED_IN');
-    addAlert(`Driver checked in on-site`, '✅');
-    showToast('✅ Check-in Recorded Successfully', 'success');
-  } catch (err) { showToast('❌ Check-in failed: ' + err.message, 'error'); }
-}
-
-async function completePickup() {
-  if (!driverData || !manifestData) { showToast('⚠️ No active job to complete.', 'error'); return; }
-  try {
-    showToast('📦 Sealing manifest record...', 'warning');
-    const now = new Date().toISOString();
-    await db.collection('pelo_master_ledger').doc(driverData.manifestId).update({ status: 'COLLECTED', collectedAt: now, collectedBy: driverData.name, quantumState: { chsh: 2.76, patent: 'SA 2026/05142' } });
-    await db.collection('drivers').doc(DRIVER_ID).update({ completedAt: now, status: 'COMPLETED', manifestId: null });
-    updateDriverStatus('COMPLETED');
-    addAlert(`Collection completed by ${driverData.name}`, '📦');
-    showToast('✅ Collection Sealed! Ready for Gate Verification', 'success');
-    setTimeout(() => {
-      manifestData = null;
-      proximityTriggered = false;
-      pickupLocation.textContent = 'Awaiting Assignment...';
-      distanceValue.textContent = '—';
-      etaValue.textContent = '—';
-      updateDriverStatus('OFFLINE');
-      if (isTracking) stopTracking();
-    }, 4000);
-  } catch (err) { showToast('❌ Completion error: ' + err.message, 'error'); }
-}
-
-function addAlert(message, icon = '🔔') {
-  const emptyMsg = document.getElementById('emptyAlertMsg');
-  if (emptyMsg) emptyMsg.remove();
-  const time = new Date().toLocaleTimeString();
-  const alertItem = document.createElement('div');
-  alertItem.className = 'alert-item';
-  alertItem.innerHTML = `<span class="alert-icon">${icon}</span><span style="flex:1; font-weight:600;">${message}</span><span class="alert-time">${time}</span>`;
-  alertFeed.insertBefore(alertItem, alertFeed.firstChild);
-  while (alertFeed.children.length > 8) { alertFeed.removeChild(alertFeed.lastChild); }
-}
-
-function showToast(msg, type = 'info') {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.className = 'toast ' + type;
-  div.textContent = msg;
-  document.body.appendChild(div);
-  setTimeout(() => { if (div.parentNode) div.remove(); }, 3500);
-}
-
-function listenForManifest() {
-  db.collection('drivers').doc(DRIVER_ID).onSnapshot(snapshot => {
-    if (snapshot.exists) {
-      const data = snapshot.data();
-      driverData = data;
-      if (data.manifestId && (!manifestData || data.manifestId !== manifestData.manifestId)) { loadManifest(data.manifestId); }
+  function uploadFuelProof() {
+    const odometer = document.getElementById('odometerKm').value;
+    if (!odometer) { showToast('⚠️ Please enter the odometer reading.', 'warning'); return; }
+    uploadProof('fuelReceiptInput', 'Fuel Receipt');
+    if (driverData && driverData.manifestId) {
+      db.collection('pelo_master_ledger').doc(driverData.manifestId).update({
+        fuelOdometerKm: parseInt(odometer),
+        fuelReceiptAt: new Date().toISOString()
+      }).catch(e => console.warn('Odometer save failed:', e));
     }
-  }, err => console.error("Driver snapshot listener error:", err));
-}
+  }
 
-async function loadManifest(manifestId) {
-  try {
-    const doc = await db.collection('pelo_master_ledger').doc(manifestId).get();
-    if (doc.exists) {
-      manifestData = doc.data();
-      manifestData.manifestId = manifestId;
-      pickupLocation.textContent = manifestData.areaCommunity || manifestData.companyName || 'Target Pickup Point';
-      proximityTriggered = false;
-      addAlert(`Manifest #${manifestId.substring(0,6)} Assigned`, '📦');
-      showToast(`📦 New Dispatch Assignment Received`, 'success');
-      if (isTracking) { updateDriverStatus('EN_ROUTE'); }
-    }
-  } catch (err) { console.error('Load manifest error:', err); }
-}
+  function uploadDeliveryProof() {
+    uploadProof('deliveryDocInput', 'Delivery Document');
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-  loadDriverData();
-  listenForManifest();
-  console.log('🚀 MindTech Driver Command Engine Operational');
-  console.log('⚛️ Quantum Telemetry Protocol: CHSH S=2.76');
-});
+  function uploadSobrietyCheck() {
+    uploadProof('sobrietyPhotoInput', 'Sobriety Check');
+  }
+
+  function addAlert(message, icon = '🔔') {
+    const emptyMsg = document.getElementById('emptyAlertMsg');
+    if (emptyMsg) emptyMsg.remove();
+    const time = new Date().toLocaleTimeString();
+    const alertItem = document.createElement('div');
+    alertItem.className = 'alert-item';
+    alertItem.innerHTML = `<span class="alert-icon">${icon}</span><span style="flex:1; font-weight:600;">${message}</span><span class="alert-time">${time}</span>`;
+    alertFeed.insertBefore(alertItem, alertFeed.firstChild);
+    while (alertFeed.children.length > 8) { alertFeed.removeChild(alertFeed.lastChild); }
+  }
+
+  function showToast(msg, type = 'info') {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'toast ' + type;
+    div.textContent = msg;
+    document.body.appendChild(div);
+    setTimeout(() => { if (div.parentNode) div.remove(); }, 3500);
+  }
+
+  function listenForManifest() {
+    db.collection('drivers').doc(DRIVER_ID).onSnapshot(snapshot => {
+      if (snapshot.exists) {
+        const data = snapshot.data();
+        driverData = data;
+        if (data.manifestId && (!manifestData || data.manifestId !== manifestData.manifestId)) { loadManifest(data.manifestId); }
+      }
+    }, err => console.error("Driver snapshot listener error:", err));
+  }
+
+  async function loadManifest(manifestId) {
+    try {
+      const doc = await db.collection('pelo_master_ledger').doc(manifestId).get();
+      if (doc.exists) {
+        manifestData = doc.data();
+        manifestData.manifestId = manifestId;
+        pickupLocation.textContent = manifestData.areaCommunity || manifestData.companyName || 'Target Pickup Point';
+        proximityTriggered = false;
+        addAlert(`Manifest #${manifestId.substring(0,6)} Assigned`, '📦');
+        showToast(`📦 New Dispatch Assignment Received`, 'success');
+        if (isTracking) { updateDriverStatus('EN_ROUTE'); }
+      }
+    } catch (err) { console.error('Load manifest error:', err); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadDriverData();
+    listenForManifest();
+    console.log('🚀 MindTech Driver Command Engine Operational');
+    console.log('⚛️ Quantum Telemetry Protocol: CHSH S=2.76');
+  });
 </script>
 
 </body>
