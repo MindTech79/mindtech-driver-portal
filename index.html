@@ -104,8 +104,17 @@
     .proof-card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; }
     .proof-card .form-group { margin-bottom: 10px; }
     .proof-card label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 6px; font-family: 'Exo 2', sans-serif; }
-    .proof-card input[type="number"], .proof-card input[type="file"] { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: white; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-    .proof-card input[type="file"] { padding: 6px; font-size: 11px; cursor: pointer; }
+    .proof-card input[type="number"] { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm); color: white; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    /* PREVIEW MODAL */
+    .preview-modal { position: fixed; inset: 0; background: rgba(3, 7, 18, 0.95); backdrop-filter: blur(8px); z-index: 99998; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .preview-modal.active { display: flex; }
+    .preview-content { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px; max-width: 440px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+    .preview-content h3 { font-size: 14px; margin-bottom: 12px; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 1px; }
+    .preview-image-wrap { width: 100%; max-height: 55vh; overflow: hidden; border-radius: var(--radius-md); border: 1px solid var(--card-border); margin-bottom: 14px; background: #000; display: flex; align-items: center; justify-content: center; }
+    .preview-image-wrap img { max-width: 100%; max-height: 55vh; object-fit: contain; }
+    .preview-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .preview-actions .btn { padding: 12px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -152,20 +161,20 @@
     </div>
   </div>
 
-  <!-- PROOF: SOBRIETY SELFIE -->
+  <!-- PROOF: SOBRIETY SELFIE (FRONT CAMERA) -->
   <div class="proof-card">
     <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
       <i class="fas fa-shield-alt" style="color: var(--accent-rose);"></i>
       <h3 style="font-size: 0.9rem;">Sobriety Check</h3>
     </div>
-    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Tap below to open camera. Photo uploads automatically.</p>
+    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Front camera opens. Preview before save. No excuses.</p>
     <input type="file" id="sobrietyPhotoInput" accept="image/*" capture="user" style="display: none;">
     <button class="btn btn-start" onclick="document.getElementById('sobrietyPhotoInput').click()" style="width:100%; padding:10px; font-size:0.75rem;">
         <i class="fas fa-camera"></i> Take Sobriety Selfie
     </button>
   </div>
 
-  <!-- PROOF: FUEL RECEIPT & ODOMETER -->
+  <!-- PROOF: FUEL RECEIPT & ODOMETER (BACK CAMERA) -->
   <div class="proof-card">
     <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
       <i class="fas fa-gas-pump" style="color: var(--accent-amber);"></i>
@@ -181,13 +190,13 @@
     </button>
   </div>
 
-  <!-- PROOF: DELIVERY DOCUMENT -->
+  <!-- PROOF: DELIVERY DOCUMENT (BACK CAMERA) -->
   <div class="proof-card">
     <div class="card-header" style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
       <i class="fas fa-file-signature" style="color: var(--accent-green);"></i>
       <h3 style="font-size: 0.9rem;">Delivery Document</h3>
     </div>
-    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Capture the signed delivery note.</p>
+    <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom:8px;">Back camera opens. Preview the signed note before save.</p>
     <input type="file" id="deliveryDocInput" accept="image/*" capture="environment" style="display: none;">
     <button class="btn btn-complete" onclick="document.getElementById('deliveryDocInput').click()" style="width:100%; padding:10px; font-size:0.75rem;">
         <i class="fas fa-camera"></i> Capture Delivery Note
@@ -212,6 +221,20 @@
     <div style="margin-top:4px;">© 2026 MindTech Driver · Built in Africa, for Africa</div>
   </div>
 
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-content">
+    <h3 id="previewTitle">Preview Photo</h3>
+    <div class="preview-image-wrap">
+      <img id="previewImage" alt="Preview">
+    </div>
+    <div class="preview-actions">
+      <button class="btn btn-stop" onclick="cancelPreview()"><i class="fas fa-redo"></i> Retake</button>
+      <button class="btn btn-start" onclick="confirmAndUpload()"><i class="fas fa-check"></i> Save & Upload</button>
+    </div>
+  </div>
 </div>
 
 <!-- HANDSHAKE -->
@@ -260,6 +283,16 @@
     firebase.initializeApp(firebaseConfig);
   }
 
+  // ============================================================
+  // ANONYMOUS AUTHENTICATION — SILENT LOGIN
+  // ============================================================
+  const auth = firebase.auth();
+  let authReady = false;
+
+  auth.signInAnonymously()
+    .then(() => { console.log('✅ Anonymous auth successful.'); })
+    .catch((error) => { console.error('❌ Anonymous auth failed:', error.message); });
+
   const db = firebase.firestore();
   const storage = firebase.storage();
   db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
@@ -273,6 +306,9 @@
   let proximityTriggered = false;
   let audioCtx = null;
 
+  // Preview state
+  let pendingProof = null; // { file, proofType, previewURL }
+
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
   const lastUpdateTime = document.getElementById('lastUpdateTime');
@@ -285,6 +321,9 @@
   const stopBtn = document.getElementById('stopBtn');
   const checkinBtn = document.getElementById('checkinBtn');
   const completeBtn = document.getElementById('completeBtn');
+  const previewModal = document.getElementById('previewModal');
+  const previewImage = document.getElementById('previewImage');
+  const previewTitle = document.getElementById('previewTitle');
 
   function playProximityChirp() {
     try {
@@ -441,9 +480,9 @@
   }
 
   // ============================================================
-  // PROOF UPLOAD — AUTO CAMERA TO FIREBASE STORAGE
+  // PROOF UPLOAD — PREVIEW BEFORE SAVE
   // ============================================================
-  async function handleProofCapture(fileInputId, proofType) {
+  function openPreview(fileInputId, proofType) {
     const input = document.getElementById(fileInputId);
     const file = input.files[0];
 
@@ -452,6 +491,40 @@
       return;
     }
 
+    // Revoke any previous preview URL
+    if (pendingProof && pendingProof.previewURL) {
+      URL.revokeObjectURL(pendingProof.previewURL);
+    }
+
+    const previewURL = URL.createObjectURL(file);
+    pendingProof = { file, proofType, inputId: fileInputId, previewURL };
+
+    previewImage.src = previewURL;
+    previewTitle.textContent = `Preview: ${proofType}`;
+    previewModal.classList.add('active');
+
+    // Clear input so the same file can be re-selected if they retake
+    input.value = '';
+  }
+
+  function cancelPreview() {
+    previewModal.classList.remove('active');
+    if (pendingProof && pendingProof.previewURL) {
+      URL.revokeObjectURL(pendingProof.previewURL);
+    }
+    pendingProof = null;
+    previewImage.src = '';
+    showToast('🔄 Retake cancelled. Tap the button again.', 'warning');
+  }
+
+  async function confirmAndUpload() {
+    if (!pendingProof) {
+      showToast('⚠️ No photo to upload.', 'error');
+      return;
+    }
+
+    const { file, proofType, previewURL } = pendingProof;
+    previewModal.classList.remove('active');
     showToast(`⏳ Uploading ${proofType}...`, 'info');
 
     try {
@@ -476,7 +549,7 @@
 
       await db.collection('driver_proofs').add(proofRecord);
 
-      // 3. If this is a fuel proof, also update the manifest
+      // 3. If fuel proof, update manifest
       if (proofType === 'Fuel Receipt') {
         const odometer = document.getElementById('odometerKm').value;
         if (odometer && driverData && driverData.manifestId) {
@@ -497,20 +570,29 @@
       addAlert(`❌ ${proofType} upload failed`, '❌');
     }
 
-    input.value = '';
+    if (previewURL) URL.revokeObjectURL(previewURL);
+    pendingProof = null;
+    previewImage.src = '';
   }
 
   // Attach event listeners to the hidden file inputs
   document.getElementById('sobrietyPhotoInput').addEventListener('change', function() {
-    handleProofCapture('sobrietyPhotoInput', 'Sobriety Check');
+    openPreview('sobrietyPhotoInput', 'Sobriety Check');
   });
 
   document.getElementById('fuelReceiptInput').addEventListener('change', function() {
-    handleProofCapture('fuelReceiptInput', 'Fuel Receipt');
+    // Validate odometer before opening preview
+    const odometer = document.getElementById('odometerKm').value;
+    if (!odometer) {
+      showToast('⚠️ Please enter the odometer reading first.', 'warning');
+      this.value = '';
+      return;
+    }
+    openPreview('fuelReceiptInput', 'Fuel Receipt');
   });
 
   document.getElementById('deliveryDocInput').addEventListener('change', function() {
-    handleProofCapture('deliveryDocInput', 'Delivery Document');
+    openPreview('deliveryDocInput', 'Delivery Document');
   });
 
   function addAlert(message, icon = '🔔') {
@@ -559,9 +641,19 @@
     } catch (err) { console.error('Load manifest error:', err); }
   }
 
+  // ============================================================
+  // WAIT FOR AUTH BEFORE LOADING DATA
+  // ============================================================
   document.addEventListener('DOMContentLoaded', function() {
-    loadDriverData();
-    listenForManifest();
+    auth.onAuthStateChanged((user) => {
+      if (user && !authReady) {
+        authReady = true;
+        console.log('✅ Auth ready. Loading driver data...');
+        loadDriverData();
+        listenForManifest();
+      }
+    });
+
     console.log('🚀 MindTech Driver Command Engine Operational');
     console.log('⚛️ Quantum Telemetry Protocol: CHSH S=2.76');
   });
