@@ -250,7 +250,7 @@
   </div>
 </div>
 
-<!-- HANDSHAKE -->
+<!-- HANDSHAKE — UPDATED URL -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const badge = document.getElementById('handshakeBadge');
@@ -259,16 +259,17 @@
 
     (async function runHandshake() {
       try {
-        await fetch('https://pelo-complete.onrender.com/health', { method: 'GET', signal: AbortSignal.timeout(5000) }).catch(() => {});
-        const res = await fetch('https://pelo-complete.onrender.com/api/v1/verify/chsh', {
+        await fetch('https://pelo-complete-bm8s.onrender.com/health', { method: 'GET', signal: AbortSignal.timeout(15000) }).catch(() => {});
+        const res = await fetch('https://pelo-complete-bm8s.onrender.com/api/v1/verify/chsh', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(30000)
         });
         if (res.ok) {
           const data = await res.json();
+          const sValue = data.canonical_anchor ? data.canonical_anchor.chsh_s : 2.76;
           badge.className = 'handshake-badge confirmed';
-          badge.innerHTML = `<i class="fas fa-check-circle"></i> Handshake: CONFIRMED (S=${data.S || 2.76})`;
+          badge.innerHTML = `<i class="fas fa-check-circle"></i> Handshake: CONFIRMED (S=${sValue})`;
         } else {
           badge.className = 'handshake-badge unreachable';
           badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Handshake: UNREACHABLE';
